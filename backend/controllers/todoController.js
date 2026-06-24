@@ -64,3 +64,29 @@ export async function deleteTodo(req, res) {
   await todoService.deleteTodo(req.params.id);
   res.status(204).send();
 }
+
+/**
+ * GET /api/todos/:id/history
+ * Get the change history for a single todo.
+ */
+export async function getTodoHistory(req, res) {
+  const history = await todoService.getTodoHistory(req.params.id);
+  res.status(200).json({
+    success: true,
+    count: history.length,
+    data: history,
+  });
+}
+
+/**
+ * GET /api/todos/history
+ * Get all history events across every todo, sorted newest-first.
+ */
+export async function getAllTodosHistory(req, res) {
+  const history = await todoService.getAllTodosHistory();
+  res.status(200).json({
+    success: true,
+    count: history.length,
+    data: history,
+  });
+}

@@ -7,6 +7,37 @@ import { createTodo } from '../models/Todo.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_FILE = path.join(__dirname, '..', 'data', 'todos.json');
 
+/** Fields tracked in history diffs (excludes internal metadata like history/updatedAt itself). */
+const TRACKED_FIELDS = ['title', 'description', 'priority', 'completed', 'dueDate'];
+
+/**
+ * Build a changes map by comparing old and new values for tracked fields.
+ * Only fields that actually changed are included.
+ * @param {Object} oldTodo
+ * @param {Object} newData - the partial update payload
+ * @returns {Object} changes map: { fieldName: { from, to } }
+ */
+function buildChanges(oldTodo, newData) {
+  const changes = {};
+  for (const field of TRACKED_FIELDS) {
+    if (field in newData && newData[field] !== oldTodo[field]) {
+      changes[field] = { from: oldTodo[field], to: newData[field] };
+    }
+  }
+  return changes;
+}
+
+/**
+ * Strip the `history` field from a todo before returning it in list/single endpoints.
+ * History is only returned via the dedicated /history endpoint.
+ * @param {Object} todo
+ * @returns {Object} todo without `history`
+ */
+function stripHistory(todo) {
+  const { history, ...rest } = todo;
+  return rest;
+}
+
 /**
  * FileRepository — Concrete implementation of IRepository.
  * All file I/O is isolated here. To swap storage (e.g., MongoDB),
@@ -43,6 +74,7 @@ export class FileRepository extends IRepository {
 
   /**
    * Retrieve all todos, with optional filtering by status, priority, and search term.
+   * The `history` field is stripped from all returned todos.
    * @param {Object} filters - { search, status, priority }
    * @returns {Promise<Array>}
    */
@@ -50,62 +82,93 @@ export class FileRepository extends IRepository {
     const todos = await this.#readFile();
     const { search, status, priority } = filters;
 
-    return todos.filter((todo) => {
-      if (search) {
-        const term = search.toLowerCase();
-        if (!todo.title.toLowerCase().includes(term)) return false;
-      }
-      if (status === 'active' && todo.completed) return false;
-      if (status === 'completed' && !todo.completed) return false;
-      if (priority && priority !== 'all' && todo.priority !== priority) return false;
-      return true;
-    });
+    return todos
+      .filter((todo) => {
+        if (search) {
+          const term = search.toLowerCase();
+          if (!todo.title.toLowerCase().includes(term)) return false;
+        }
+        if (status === 'active' && todo.completed) return false;
+        if (status === 'completed' && !todo.completed) return false;
+        if (priority && priority !== 'all' && todo.priority !== priority) return false;
+        return true;
+      })
+      .map(stripHistory);
   }
 
   /**
    * Find a single todo by ID.
+   * The `history` field is stripped from the returned todo.
    * @param {string} id
    * @returns {Promise<Object|null>}
    */
   async findById(id) {
     const todos = await this.#readFile();
-    return todos.find((t) => t.id === id) || null;
+    const todo = todos.find((t) => t.id === id);
+    return todo ? stripHistory(todo) : null;
   }
 
   /**
    * Create and persist a new todo.
+   * Appends an initial 'created' history event.
    * @param {Object} data
-   * @returns {Promise<Object>}
+   * @returns {Promise<Object>} The created todo (without history field).
    */
   async create(data) {
     const todos = await this.#readFile();
     const newTodo = createTodo(data);
+
+    // Append the 'created' history event
+    newTodo.history = [
+      {
+        event: 'created',
+        timestamp: newTodo.createdAt,
+        changes: {},
+      },
+    ];
+
     todos.push(newTodo);
     await this.#writeFile(todos);
-    return newTodo;
+    return stripHistory(newTodo);
   }
 
   /**
-   * Update an existing todo by ID. Merges fields and updates updatedAt.
+   * Update an existing todo by ID. Merges fields, records a history event,
+   * and updates `updatedAt`.
    * @param {string} id
    * @param {Object} data
-   * @returns {Promise<Object|null>}
+   * @returns {Promise<Object|null>} The updated todo (without history field).
    */
   async update(id, data) {
     const todos = await this.#readFile();
     const index = todos.findIndex((t) => t.id === id);
     if (index === -1) return null;
 
+    const old = todos[index];
+    const now = new Date().toISOString();
+
+    // Diff tracked fields to build the changes record
+    const changes = buildChanges(old, data);
+
     const updated = {
-      ...todos[index],
+      ...old,
       ...data,
-      id: todos[index].id,           // ID is immutable
-      createdAt: todos[index].createdAt, // createdAt is immutable
-      updatedAt: new Date().toISOString(),
+      id: old.id,           // ID is immutable
+      createdAt: old.createdAt, // createdAt is immutable
+      updatedAt: now,
+      history: [
+        ...(old.history || []),
+        {
+          event: 'updated',
+          timestamp: now,
+          changes,
+        },
+      ],
     };
+
     todos[index] = updated;
     await this.#writeFile(todos);
-    return updated;
+    return stripHistory(updated);
   }
 
   /**
@@ -120,5 +183,42 @@ export class FileRepository extends IRepository {
     todos.splice(index, 1);
     await this.#writeFile(todos);
     return true;
+  }
+
+  /**
+   * Retrieve the change history for a todo by ID.
+   * Returns the raw history array stored inside the todo.
+   * @param {string} id
+   * @returns {Promise<Array|null>} history array, or null if todo not found
+   */
+  async getHistory(id) {
+    const todos = await this.#readFile();
+    const todo = todos.find((t) => t.id === id);
+    if (!todo) return null;
+    return todo.history || [];
+  }
+
+  /**
+   * Retrieve all history events across every todo, sorted newest-first.
+   * Each event is annotated with { todoId, todoTitle } for display.
+   * @returns {Promise<Array>}
+   */
+  async getAllHistory() {
+    const todos = await this.#readFile();
+    const events = [];
+
+    for (const todo of todos) {
+      for (const entry of (todo.history || [])) {
+        events.push({
+          ...entry,
+          todoId: todo.id,
+          todoTitle: todo.title,
+        });
+      }
+    }
+
+    // Sort all events newest-first
+    events.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    return events;
   }
 }

@@ -161,4 +161,25 @@ export const todoService = {
     const deleted = await repository.delete(id);
     if (!deleted) throw new NotFoundError(`Todo with id "${id}" not found`);
   },
+
+  /**
+   * Retrieve the change history for a todo by ID.
+   * Throws NotFoundError if the todo does not exist.
+   * @param {string} id
+   * @returns {Promise<Array>} array of history events
+   */
+  async getTodoHistory(id) {
+    if (!id) throw new ValidationError('ID is required');
+    const history = await repository.getHistory(id);
+    if (history === null) throw new NotFoundError(`Todo with id "${id}" not found`);
+    return history;
+  },
+
+  /**
+   * Retrieve all history events across every todo, sorted newest-first.
+   * @returns {Promise<Array>}
+   */
+  async getAllTodosHistory() {
+    return repository.getAllHistory();
+  },
 };

@@ -1,22 +1,39 @@
 [
   {
-    "id": "26d44270-30eb-48d5-b4b1-65588b67da1c",
-    "title": "Buy groceries",
-    "description": "Need milk, eggs, and bread",
+    "id": "93ecef67-0007-4bf2-ae48-9e1d069217ca",
+    "title": "headoffice",
+    "description": "",
     "priority": "medium",
     "completed": false,
-    "dueDate": null,
-    "createdAt": "2026-06-24T16:53:07.209Z",
-    "updatedAt": "2026-06-24T16:59:30.586Z"
-  },
-  {
-    "id": "9cced588-ecea-4f35-b2d4-12afd58b2d46",
-    "title": "Write integration tests",
-    "description": "Write integration tests for frontend and backend API endpoints",
-    "priority": "medium",
-    "completed": false,
-    "dueDate": null,
-    "createdAt": "2026-06-24T16:56:59.430Z",
-    "updatedAt": "2026-06-24T16:59:31.330Z"
+    "dueDate": "2026-06-25T00:00:00.000Z",
+    "createdAt": "2026-06-24T18:14:45.827Z",
+    "updatedAt": "2026-06-24T18:14:53.641Z",
+    "history": [
+      {
+        "event": "created",
+        "timestamp": "2026-06-24T18:14:45.827Z",
+        "changes": {}
+      },
+      {
+        "event": "updated",
+        "timestamp": "2026-06-24T18:14:53.303Z",
+        "changes": {
+          "completed": {
+            "from": false,
+            "to": true
+          }
+        }
+      },
+      {
+        "event": "updated",
+        "timestamp": "2026-06-24T18:14:53.641Z",
+        "changes": {
+          "completed": {
+            "from": true,
+            "to": false
+          }
+        }
+      }
+    ]
   }
 ]

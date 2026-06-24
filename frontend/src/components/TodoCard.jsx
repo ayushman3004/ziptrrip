@@ -39,9 +39,9 @@ export default function TodoCard({ todo, onToggle, onEdit, onDelete }) {
 
       {/* Content */}
       <div className="todo-card__content">
-        {/* Title — navigates to detail page via window.location.href */}
+        {/* Title — navigates to detail page (MPA: separate todo.html page) */}
         <a
-          href={`/todo?id=${todo.id}`}
+          href={`/todo.html?id=${todo.id}`}
           className={`todo-card__title ${todo.completed ? 'todo-card__title--done' : ''}`}
           id={`todo-link-${todo.id}`}
         >

@@ -6,6 +6,7 @@ import TodoCard from '../components/TodoCard';
 import AddEditModal from '../components/AddEditModal';
 import EmptyState from '../components/EmptyState';
 import ThemeToggle from '../components/ThemeToggle';
+import GlobalHistory from '../components/GlobalHistory';
 
 /**
  * TodoList — Page 1, route "/".
@@ -129,6 +130,9 @@ export default function TodoList() {
             ))}
           </div>
         )}
+
+        {/* Global Recent Activity */}
+        <GlobalHistory />
       </main>
 
       {/* Add/Edit Modal */}

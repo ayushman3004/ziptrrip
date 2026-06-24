@@ -86,3 +86,24 @@ export async function deleteTodo(id) {
   const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
   await handleResponse(res);
 }
+
+/**
+ * Fetch the change history for a single todo by ID.
+ * @param {string} id
+ * @returns {Promise<Array>} array of history events
+ */
+export async function fetchTodoHistory(id) {
+  const res = await fetch(`${BASE_URL}/${id}/history`);
+  const json = await handleResponse(res);
+  return json.data;
+}
+
+/**
+ * Fetch all history events across every todo, sorted newest-first.
+ * @returns {Promise<Array>} array of annotated history events (with todoId, todoTitle)
+ */
+export async function fetchAllHistory() {
+  const res = await fetch(`${BASE_URL}/history`);
+  const json = await handleResponse(res);
+  return json.data;
+}

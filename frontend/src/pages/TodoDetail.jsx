@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, CheckCircle, Undo, Pencil, Trash2, Copy, Check } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Undo, Pencil, Trash2, Copy, Check, History, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTodo } from '../hooks/useTodo';
 import PriorityBadge from '../components/PriorityBadge';
 import AddEditModal from '../components/AddEditModal';
@@ -14,12 +14,17 @@ export default function TodoDetail() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get('id');
 
-  const { todo, loading, error, updateCurrentTodo, deleteCurrentTodo, toggleCurrentTodo } = useTodo(id);
+  const {
+    todo, loading, error,
+    updateCurrentTodo, deleteCurrentTodo, toggleCurrentTodo,
+    history, historyLoading, historyError, loadHistory,
+  } = useTodo(id);
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [actionError, setActionError] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const goBack = () => { window.location.href = '/'; };
 
@@ -41,7 +46,7 @@ export default function TodoDetail() {
   const handleDelete = async () => {
     setActionError(null);
     try {
-      await deleteCurrentTodo(); // redirects to / on success
+      await deleteCurrentTodo();
     } catch (err) {
       setActionError(err.message || 'Failed to delete');
       setDeleteConfirm(false);
@@ -54,6 +59,12 @@ export default function TodoDetail() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
+  };
+
+  const handleHistoryToggle = () => {
+    const next = !historyOpen;
+    setHistoryOpen(next);
+    if (next) loadHistory(); // lazy fetch on first open
   };
 
   const formatDate = (iso) => {
@@ -69,6 +80,14 @@ export default function TodoDetail() {
     return new Date(iso).toLocaleDateString('en-US', {
       month: 'long', day: 'numeric', year: 'numeric',
     });
+  };
+
+  /** Format a raw field value for display in the history diff table. */
+  const formatFieldValue = (field, value) => {
+    if (value === null || value === undefined) return '—';
+    if (field === 'completed') return value ? 'Completed' : 'Active';
+    if (field === 'dueDate') return formatDateOnly(value);
+    return String(value);
   };
 
   const isOverdue = todo?.dueDate && !todo.completed && new Date(todo.dueDate) < new Date();
@@ -131,7 +150,7 @@ export default function TodoDetail() {
                 <PriorityBadge priority={todo.priority} />
                 {isOverdue && <span className="badge badge-overdue">Overdue</span>}
               </div>
-              
+
               <div className="detail-card__actions">
                 <button
                   className={`btn ${todo.completed ? 'btn-secondary' : 'btn-success'}`}
@@ -139,33 +158,21 @@ export default function TodoDetail() {
                   id="toggle-complete-btn"
                 >
                   {todo.completed ? (
-                    <>
-                      <Undo size={16} /> Mark Incomplete
-                    </>
+                    <><Undo size={16} /> Mark Incomplete</>
                   ) : (
-                    <>
-                      <CheckCircle size={16} /> Mark Complete
-                    </>
+                    <><CheckCircle size={16} /> Mark Complete</>
                   )}
                 </button>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => setEditModalOpen(true)}
-                  id="detail-edit-btn"
-                >
+                <button className="btn btn-primary" onClick={() => setEditModalOpen(true)} id="detail-edit-btn">
                   <Pencil size={16} /> Edit
                 </button>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => setDeleteConfirm(true)}
-                  id="detail-delete-btn"
-                >
+                <button className="btn btn-danger" onClick={() => setDeleteConfirm(true)} id="detail-delete-btn">
                   <Trash2 size={16} /> Delete
                 </button>
               </div>
             </div>
 
-            {/* Status pill & metadata grid */}
+            {/* Metadata grid */}
             <div className="detail-card__fields">
               <div className="detail-grid">
                 {/* ID */}
@@ -221,12 +228,94 @@ export default function TodoDetail() {
                 </div>
               </div>
 
-              {/* Description Section */}
+              {/* Description */}
               <div className="detail-field">
                 <span className="detail-field__label">Description</span>
                 <div className="detail-field__value" style={{ background: 'var(--clr-surface-2)', padding: '1rem 1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--clr-border)' }}>
                   {todo.description || <em className="detail-field__empty">No description provided.</em>}
                 </div>
+              </div>
+
+              {/* ── Change History ── */}
+              <div className="history-section">
+                <button
+                  className="history-toggle"
+                  onClick={handleHistoryToggle}
+                  aria-expanded={historyOpen}
+                  id="history-toggle-btn"
+                >
+                  <span className="history-toggle__label">
+                    <History size={16} />
+                    Change History
+                  </span>
+                  {historyOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </button>
+
+                {historyOpen && (
+                  <div className="history-body" aria-live="polite">
+                    {historyLoading && (
+                      <div className="loading-container" style={{ padding: '1.5rem' }}>
+                        <div className="spinner" style={{ width: '1.5rem', height: '1.5rem' }} />
+                        <p style={{ fontSize: 'var(--text-sm)' }}>Loading history…</p>
+                      </div>
+                    )}
+
+                    {historyError && (
+                      <div className="error-banner" style={{ margin: '1rem 0' }}>
+                        ⚠️ {historyError}
+                      </div>
+                    )}
+
+                    {!historyLoading && !historyError && history.length === 0 && (
+                      <p className="history-empty">No history available for this todo.</p>
+                    )}
+
+                    {!historyLoading && !historyError && history.length > 0 && (
+                      <ol className="history-timeline">
+                        {[...history].reverse().map((entry, idx) => (
+                          <li key={idx} className="history-event">
+                            <div className="history-event__dot" />
+                            <div className="history-event__content">
+                              <div className="history-event__header">
+                                <span className={`history-event__badge history-event__badge--${entry.event}`}>
+                                  {entry.event === 'created' ? 'Created' : 'Updated'}
+                                </span>
+                                <time className="history-event__time" dateTime={entry.timestamp}>
+                                  {formatDate(entry.timestamp)}
+                                </time>
+                              </div>
+
+                              {entry.event === 'updated' && Object.keys(entry.changes).length > 0 && (
+                                <table className="history-changes-table">
+                                  <thead>
+                                    <tr>
+                                      <th>Field</th>
+                                      <th>From</th>
+                                      <th>To</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {Object.entries(entry.changes).map(([field, { from, to }]) => (
+                                      <tr key={field}>
+                                        <td className="history-changes-table__field">{field}</td>
+                                        <td className="history-changes-table__from">{formatFieldValue(field, from)}</td>
+                                        <td className="history-changes-table__to">{formatFieldValue(field, to)}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              )}
+
+                              {entry.event === 'updated' && Object.keys(entry.changes).length === 0 && (
+                                <p className="history-no-changes">No tracked fields changed.</p>
+                              )}
+                            </div>
+                          </li>
+                        ))}
+                      </ol>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -248,7 +337,7 @@ export default function TodoDetail() {
           <div className="modal modal--sm">
             <div className="modal__header">
               <h2 id="confirm-del-title" className="modal__title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Trash2 size={18} className="text-danger" /> Delete Todo?
+                <Trash2 size={18} /> Delete Todo?
               </h2>
             </div>
             <p className="modal__body-text">

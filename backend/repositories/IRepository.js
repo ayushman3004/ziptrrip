@@ -50,4 +50,22 @@ export class IRepository {
   async delete(id) {
     throw new Error('Not implemented');
   }
+
+  /**
+   * Retrieve the change history of a single record by its ID.
+   * @param {string} id
+   * @returns {Promise<Array>}
+   */
+  async getHistory(id) {
+    throw new Error('Not implemented');
+  }
+
+  /**
+   * Retrieve all history events across every record, sorted newest-first.
+   * Each event is annotated with todoId and todoTitle.
+   * @returns {Promise<Array>}
+   */
+  async getAllHistory() {
+    throw new Error('Not implemented');
+  }
 }

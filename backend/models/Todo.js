@@ -16,5 +16,6 @@ export function createTodo(data) {
     dueDate: data.dueDate || null,
     createdAt: data.createdAt || now,
     updatedAt: data.updatedAt || now,
+    history: data.history || [],
   };
 }

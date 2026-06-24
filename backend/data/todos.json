@@ -4,10 +4,10 @@
     "title": "headoffice",
     "description": "",
     "priority": "medium",
-    "completed": false,
+    "completed": true,
     "dueDate": "2026-06-25T00:00:00.000Z",
     "createdAt": "2026-06-24T18:14:45.827Z",
-    "updatedAt": "2026-06-24T18:14:53.641Z",
+    "updatedAt": "2026-06-24T19:34:24.580Z",
     "history": [
       {
         "event": "created",
@@ -33,6 +33,36 @@
             "to": false
           }
         }
+      },
+      {
+        "event": "updated",
+        "timestamp": "2026-06-24T18:38:45.836Z",
+        "changes": {
+          "completed": {
+            "from": false,
+            "to": true
+          }
+        }
+      },
+      {
+        "event": "updated",
+        "timestamp": "2026-06-24T18:38:49.731Z",
+        "changes": {
+          "completed": {
+            "from": true,
+            "to": false
+          }
+        }
+      },
+      {
+        "event": "updated",
+        "timestamp": "2026-06-24T19:34:24.580Z",
+        "changes": {
+          "completed": {
+            "from": false,
+            "to": true
+          }
+        }
       }
     ]
   },
@@ -41,10 +71,10 @@
     "title": "Test History Page",
     "description": "",
     "priority": "medium",
-    "completed": false,
+    "completed": true,
     "dueDate": null,
     "createdAt": "2026-06-24T18:28:29.897Z",
-    "updatedAt": "2026-06-24T18:34:54.431Z",
+    "updatedAt": "2026-06-24T19:35:44.708Z",
     "history": [
       {
         "event": "created",
@@ -68,6 +98,43 @@
           "completed": {
             "from": true,
             "to": false
+          }
+        }
+      },
+      {
+        "event": "updated",
+        "timestamp": "2026-06-24T19:35:44.708Z",
+        "changes": {
+          "completed": {
+            "from": false,
+            "to": true
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "e01edf03-d706-4fbb-b0d8-d0171353367f",
+    "title": "need to call my jerry",
+    "description": "",
+    "priority": "high",
+    "completed": true,
+    "dueDate": "2026-06-26T00:00:00.000Z",
+    "createdAt": "2026-06-24T19:36:14.191Z",
+    "updatedAt": "2026-06-24T19:37:48.209Z",
+    "history": [
+      {
+        "event": "created",
+        "timestamp": "2026-06-24T19:36:14.191Z",
+        "changes": {}
+      },
+      {
+        "event": "updated",
+        "timestamp": "2026-06-24T19:37:48.209Z",
+        "changes": {
+          "completed": {
+            "from": false,
+            "to": true
           }
         }
       }

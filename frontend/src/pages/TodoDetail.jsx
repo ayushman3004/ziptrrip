@@ -82,13 +82,6 @@ export default function TodoDetail() {
     });
   };
 
-  /** Format a raw field value for display in the history diff table. */
-  const formatFieldValue = (field, value) => {
-    if (value === null || value === undefined) return '—';
-    if (field === 'completed') return value ? 'Completed' : 'Active';
-    if (field === 'dueDate') return formatDateOnly(value);
-    return String(value);
-  };
 
   const isOverdue = todo?.dueDate && !todo.completed && new Date(todo.dueDate) < new Date();
 
@@ -106,7 +99,12 @@ export default function TodoDetail() {
             </span>
             <h1 className="page-header__title">Todo Detail</h1>
           </div>
-          <ThemeToggle />
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            <a href="/history.html" className="btn btn-ghost" id="history-page-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+              <History size={16} /> History
+            </a>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
@@ -266,54 +264,38 @@ export default function TodoDetail() {
                       </div>
                     )}
 
-                    {!historyLoading && !historyError && history.length === 0 && (
-                      <p className="history-empty">No history available for this todo.</p>
-                    )}
-
-                    {!historyLoading && !historyError && history.length > 0 && (
-                      <ol className="history-timeline">
-                        {[...history].reverse().map((entry, idx) => (
-                          <li key={idx} className="history-event">
-                            <div className="history-event__dot" />
-                            <div className="history-event__content">
-                              <div className="history-event__header">
-                                <span className={`history-event__badge history-event__badge--${entry.event}`}>
-                                  {entry.event === 'created' ? 'Created' : 'Updated'}
-                                </span>
-                                <time className="history-event__time" dateTime={entry.timestamp}>
-                                  {formatDate(entry.timestamp)}
-                                </time>
-                              </div>
-
-                              {entry.event === 'updated' && Object.keys(entry.changes).length > 0 && (
-                                <table className="history-changes-table">
-                                  <thead>
-                                    <tr>
-                                      <th>Field</th>
-                                      <th>From</th>
-                                      <th>To</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {Object.entries(entry.changes).map(([field, { from, to }]) => (
-                                      <tr key={field}>
-                                        <td className="history-changes-table__field">{field}</td>
-                                        <td className="history-changes-table__from">{formatFieldValue(field, from)}</td>
-                                        <td className="history-changes-table__to">{formatFieldValue(field, to)}</td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              )}
-
-                              {entry.event === 'updated' && Object.keys(entry.changes).length === 0 && (
-                                <p className="history-no-changes">No tracked fields changed.</p>
-                              )}
-                            </div>
-                          </li>
-                        ))}
-                      </ol>
-                    )}
+                    {!historyLoading && !historyError && (() => {
+                      const filtered = history.filter(
+                        (entry) =>
+                          entry.event === 'created' ||
+                          (entry.event === 'updated' && entry.changes?.completed?.to === true)
+                      );
+                      if (filtered.length === 0) {
+                        return <p className="history-empty">No history available for this todo.</p>;
+                      }
+                      return (
+                        <ol className="history-timeline">
+                          {[...filtered].reverse().map((entry, idx) => {
+                            const isCreated = entry.event === 'created';
+                            return (
+                              <li key={idx} className="history-event">
+                                <div className="history-event__dot" />
+                                <div className="history-event__content">
+                                  <div className="history-event__header">
+                                    <span className={`history-event__badge history-event__badge--${isCreated ? 'created' : 'completed'}`}>
+                                      {isCreated ? 'Created' : 'Completed'}
+                                    </span>
+                                    <time className="history-event__time" dateTime={entry.timestamp}>
+                                      {formatDate(entry.timestamp)}
+                                    </time>
+                                  </div>
+                                </div>
+                              </li>
+                            );
+                          })}
+                        </ol>
+                      );
+                    })()}
                   </div>
                 )}
               </div>

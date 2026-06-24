@@ -35,5 +35,42 @@
         }
       }
     ]
+  },
+  {
+    "id": "3e1bba67-e9d6-4577-b98b-411b5270cbc5",
+    "title": "Test History Page",
+    "description": "",
+    "priority": "medium",
+    "completed": false,
+    "dueDate": null,
+    "createdAt": "2026-06-24T18:28:29.897Z",
+    "updatedAt": "2026-06-24T18:34:54.431Z",
+    "history": [
+      {
+        "event": "created",
+        "timestamp": "2026-06-24T18:28:29.897Z",
+        "changes": {}
+      },
+      {
+        "event": "updated",
+        "timestamp": "2026-06-24T18:28:43.647Z",
+        "changes": {
+          "completed": {
+            "from": false,
+            "to": true
+          }
+        }
+      },
+      {
+        "event": "updated",
+        "timestamp": "2026-06-24T18:34:54.431Z",
+        "changes": {
+          "completed": {
+            "from": true,
+            "to": false
+          }
+        }
+      }
+    ]
   }
 ]

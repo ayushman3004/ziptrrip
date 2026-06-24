@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { CheckSquare, Plus, Trash2 } from 'lucide-react';
+import { CheckSquare, Plus, Trash2, History } from 'lucide-react';
 import { useTodos } from '../hooks/useTodos';
 import FilterBar from '../components/FilterBar';
 import TodoCard from '../components/TodoCard';
 import AddEditModal from '../components/AddEditModal';
 import EmptyState from '../components/EmptyState';
 import ThemeToggle from '../components/ThemeToggle';
-import GlobalHistory from '../components/GlobalHistory';
 
 /**
  * TodoList — Page 1, route "/".
@@ -63,6 +62,9 @@ export default function TodoList() {
             <h1 className="page-header__title">Ziptrrip Todos</h1>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            <a href="/history.html" className="btn btn-ghost" id="history-page-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+              <History size={16} /> History
+            </a>
             <ThemeToggle />
             <button className="btn btn-primary" onClick={openAddModal} id="add-todo-btn">
               <Plus size={16} /> Add Todo
@@ -131,8 +133,6 @@ export default function TodoList() {
           </div>
         )}
 
-        {/* Global Recent Activity */}
-        <GlobalHistory />
       </main>
 
       {/* Add/Edit Modal */}

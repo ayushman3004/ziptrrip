@@ -16,6 +16,8 @@ export default defineConfig({
         main: resolve(__dirname, 'index.html'),
         // Page 2 — Todo Detail (served at /todo.html or /todo)
         todo: resolve(__dirname, 'todo.html'),
+        // Page 3 — Activity History (served at /history.html or /history)
+        history: resolve(__dirname, 'history.html'),
       },
     },
   },

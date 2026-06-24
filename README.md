@@ -118,5 +118,3 @@ project-root/
 ```
 http://localhost:3001/api/todos
 ```
-
-See [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) for full endpoint reference.

@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "id": "26d44270-30eb-48d5-b4b1-65588b67da1c",
+    "title": "Buy groceries",
+    "description": "Need milk, eggs, and bread",
+    "priority": "medium",
+    "completed": false,
+    "dueDate": null,
+    "createdAt": "2026-06-24T16:53:07.209Z",
+    "updatedAt": "2026-06-24T16:59:30.586Z"
+  },
+  {
+    "id": "9cced588-ecea-4f35-b2d4-12afd58b2d46",
+    "title": "Write integration tests",
+    "description": "Write integration tests for frontend and backend API endpoints",
+    "priority": "medium",
+    "completed": false,
+    "dueDate": null,
+    "createdAt": "2026-06-24T16:56:59.430Z",
+    "updatedAt": "2026-06-24T16:59:31.330Z"
+  }
+]

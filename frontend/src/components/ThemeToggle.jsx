@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Sun, Moon } from 'lucide-react';
 
 /**
  * ThemeToggle — toggles between light and dark mode by setting
@@ -22,7 +23,7 @@ export default function ThemeToggle() {
       title={dark ? 'Light mode' : 'Dark mode'}
       id="theme-toggle-btn"
     >
-      {dark ? '☀️' : '🌙'}
+      {dark ? <Sun size={18} /> : <Moon size={18} />}
     </button>
   );
 }

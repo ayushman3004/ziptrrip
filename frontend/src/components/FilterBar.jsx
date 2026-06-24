@@ -1,3 +1,5 @@
+import { Search, X, ArrowUp, ArrowDown } from 'lucide-react';
+
 /**
  * FilterBar — search input, status/priority dropdowns, and sort controls.
  *
@@ -25,7 +27,10 @@ export default function FilterBar({
     <div className="filter-bar" role="search" aria-label="Filter and search todos">
       {/* Search */}
       <div className="filter-bar__search">
-        <span className="filter-bar__search-icon" aria-hidden="true">🔍</span>
+        <label htmlFor="search-input" className="filter-bar__label">Search</label>
+        <span className="filter-bar__search-icon" aria-hidden="true">
+          <Search size={15} />
+        </span>
         <input
           id="search-input"
           type="text"
@@ -42,7 +47,7 @@ export default function FilterBar({
             aria-label="Clear search"
             title="Clear search"
           >
-            ✕
+            <X size={14} />
           </button>
         )}
       </div>
@@ -93,7 +98,7 @@ export default function FilterBar({
         </select>
       </div>
 
-      {sortBy && (
+      {sortBy ? (
         <button
           id="sort-dir-btn"
           className="filter-bar__sort-dir"
@@ -101,8 +106,10 @@ export default function FilterBar({
           aria-label={`Sort direction: ${sortDir === 'asc' ? 'ascending' : 'descending'}`}
           title="Toggle sort direction"
         >
-          {sortDir === 'asc' ? '↑ Asc' : '↓ Desc'}
+          {sortDir === 'asc' ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
         </button>
+      ) : (
+        <div style={{ width: '38px', height: '38px' }} />
       )}
     </div>
   );

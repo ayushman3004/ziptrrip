@@ -1,28 +1,41 @@
-import express from 'express';
-import cors from 'cors';
-import todoRoutes from './routes/todos.js';
-import { errorHandler } from './middleware/errorHandler.js';
+import express from "express";
+import cors from "cors";
+import todoRoutes from "./routes/todos.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 const PORT = 3001;
 
 // ─── Middleware ────────────────────────────────────────────────────────────────
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "http://localhost:5175",
+      "http://localhost:5176",
+    ],
+  }),
+);
 app.use(express.json());
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
-app.use('/api/todos', todoRoutes);
+app.use("/api/todos", todoRoutes);
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
 // ─── 404 Handler (unknown routes) ─────────────────────────────────────────────
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    error: { name: 'NotFoundError', message: `Route ${req.method} ${req.path} not found` },
+    error: {
+      name: "NotFoundError",
+      message: `Route ${req.method} ${req.path} not found`,
+    },
   });
 });
 

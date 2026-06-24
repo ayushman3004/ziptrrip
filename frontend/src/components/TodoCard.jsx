@@ -1,3 +1,4 @@
+import { Calendar, Check, Pencil, Trash2 } from 'lucide-react';
 import PriorityBadge from './PriorityBadge';
 
 /**
@@ -32,9 +33,7 @@ export default function TodoCard({ todo, onToggle, onEdit, onDelete }) {
         id={`toggle-${todo.id}`}
       >
         {todo.completed && (
-          <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
-            <path d="M1 5l3.5 3.5L11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <Check size={12} strokeWidth={3} color="white" />
         )}
       </button>
 
@@ -57,7 +56,7 @@ export default function TodoCard({ todo, onToggle, onEdit, onDelete }) {
           <PriorityBadge priority={todo.priority} />
           {todo.dueDate && (
             <span className={`todo-card__due ${isOverdue ? 'todo-card__due--overdue' : ''}`}>
-              📅 {formatDate(todo.dueDate)}{isOverdue ? ' · Overdue' : ''}
+              <Calendar size={12} style={{ display: 'inline', verticalAlign: 'text-bottom' }} /> {formatDate(todo.dueDate)}{isOverdue ? ' · Overdue' : ''}
             </span>
           )}
         </div>
@@ -72,7 +71,7 @@ export default function TodoCard({ todo, onToggle, onEdit, onDelete }) {
           title="Edit"
           id={`edit-${todo.id}`}
         >
-          ✏️
+          <Pencil size={14} />
         </button>
         <button
           className="btn btn-icon btn-icon--delete"
@@ -81,7 +80,7 @@ export default function TodoCard({ todo, onToggle, onEdit, onDelete }) {
           title="Delete"
           id={`delete-${todo.id}`}
         >
-          🗑️
+          <Trash2 size={14} />
         </button>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { CheckSquare, Plus, Trash2 } from 'lucide-react';
 import { useTodos } from '../hooks/useTodos';
 import FilterBar from '../components/FilterBar';
 import TodoCard from '../components/TodoCard';
@@ -55,13 +56,15 @@ export default function TodoList() {
       <header className="page-header">
         <div className="page-header__inner">
           <div className="page-header__brand">
-            <span className="page-header__logo" aria-hidden="true">✅</span>
+            <span className="page-header__logo" aria-hidden="true">
+              <CheckSquare size={22} style={{ display: 'block' }} />
+            </span>
             <h1 className="page-header__title">Ziptrrip Todos</h1>
           </div>
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
             <ThemeToggle />
             <button className="btn btn-primary" onClick={openAddModal} id="add-todo-btn">
-              + Add Todo
+              <Plus size={16} /> Add Todo
             </button>
           </div>
         </div>
@@ -142,7 +145,9 @@ export default function TodoList() {
         <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
           <div className="modal modal--sm">
             <div className="modal__header">
-              <h2 id="confirm-title" className="modal__title">🗑️ Delete Todo?</h2>
+              <h2 id="confirm-title" className="modal__title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Trash2 size={18} className="text-danger" /> Delete Todo?
+              </h2>
             </div>
             <p className="modal__body-text">
               This action cannot be undone. Are you sure you want to delete this todo?

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 
 const PRIORITY_OPTIONS = ['low', 'medium', 'high'];
 
@@ -87,9 +88,11 @@ export default function AddEditModal({ todo, onSubmit, onClose }) {
       <div className="modal">
         <div className="modal__header">
           <h2 id="modal-title" className="modal__title">
-            {isEdit ? '✏️ Edit Todo' : '✨ Add New Todo'}
+            {isEdit ? 'Edit Todo' : 'Add New Todo'}
           </h2>
-          <button className="modal__close" onClick={onClose} aria-label="Close modal" id="modal-close-btn">✕</button>
+          <button className="modal__close" onClick={onClose} aria-label="Close modal" id="modal-close-btn">
+            <X size={18} />
+          </button>
         </div>
 
         <form className="modal__form" onSubmit={handleSubmit} noValidate id="add-edit-form">
